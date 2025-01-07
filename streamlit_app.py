@@ -69,6 +69,7 @@ bucket = client.get_bucket('streamlit-bucket-bot-eval')
 file_name = 'NA'
 
 
+
 if not user_PID:
     st.info("Please enter your participant ID to continue.", icon="🗝️")
 else:
@@ -93,8 +94,8 @@ else:
     # set up streamlit history memory
     msgs = StreamlitChatMessageHistory(key="chat_history")
 
-    # Create a session state variable to store the chat messages. This ensures that the
-    # messages persist across reruns.
+    # Create a session state variable to store the chat messages. 
+    # This ensures that the messages persist across reruns.
     if "messages" not in st.session_state:
         st.session_state.messages = [
             # Prewritten first turn
@@ -102,10 +103,8 @@ else:
             {"role": "assistant", "content": """Hello, I am an AI therapist, here to support you in navigating the challenges and emotions you may face as a caregiver. 
              Is there a specific caregiving challenge or experience you would like to share with me today?"""},
         ]
-    if "disabled" not in st.session_state:
-        st.session_state.disabled = False
 
-    
+    # SIDEBAR CONTENT
     with st.sidebar:
         with st.expander(label='Evaluation Section 1', expanded=True):
             col1, col2, col3 = st.columns(3)
@@ -245,8 +244,8 @@ else:
             }
             ratings_df = pd.DataFrame(ratings_data)
             
-            ratings_file_name = "EvalRatings_Unadapted_P{PID}.csv".format(PID=user_PID)
-            # ratings_file_name = "EvalRatings_{style}_P{PID}.csv".format(style=target_styles[style_id], PID=user_PID)
+            # ratings_file_name = "EvalRatings_Unadapted_P{PID}.csv".format(PID=user_PID)
+            ratings_file_name = "EvalRatings_{style}_P{PID}.csv".format(style=target_styles[style_id], PID=user_PID)
             ratings_df.to_csv(ratings_file_name, index=False)
             blob = bucket.blob(ratings_file_name)
             blob.upload_from_filename(ratings_file_name)
@@ -268,15 +267,14 @@ else:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
+
     chat_history_df = pd.DataFrame(st.session_state.messages)
-    
     
     # Create a chat input field to allow the user to enter a message. This will display
     # automatically at the bottom of the page.
     if user_input := st.chat_input("Enter your input here."):
-
-
-        # create a therapy chatbot llm chain
+        
+        # Create a therapy chatbot llm chain
         therapyagent_chain = therapyagent_prompt_template | llm
         therapy_chain_with_history = RunnableWithMessageHistory(
             therapyagent_chain,
@@ -294,12 +292,10 @@ else:
             output_parser=StrOutputParser()
         )
 
-
         # Store and display the current prompt.
         st.session_state.messages.append({"role": "user", "content": user_input})
         with st.chat_message("user"):
             st.markdown(user_input)
-
 
         config = {"configurable": {"session_id": "any"}}
         unada_response = therapy_chain_with_history.invoke({"input": user_input}, config)
@@ -317,15 +313,15 @@ else:
         # Stream the response to the chat using `st.write_stream`, then store it in 
         # session state.
         with st.chat_message("assistant"):
-            response = st.write_stream(response_generator(response = unada_bot_response))
+            response = st.write_stream(response_generator(response = ada_response))
 
-        st.session_state.messages.append({"role": "assistant", "content": unada_bot_response})
+        st.session_state.messages.append({"role": "assistant", "content": ada_response})
         chat_history_df = pd.DataFrame(st.session_state.messages)
 
     # automatically save the conversation after reaching the minimum turns (e.g. 10)
     if chat_history_df.shape[0]>=min_turns or (user_input=="SAVE" or user_input=="save" or user_input=="STOP" or user_input=="stop"):
-        file_name = "Unadapted_P{PID}.csv".format(PID=user_PID)
-        # file_name = "{style}_P{PID}.csv".format(style=target_styles[style_id], PID=user_PID)
+        # file_name = "Unadapted_P{PID}.csv".format(PID=user_PID)
+        file_name = "{style}_P{PID}.csv".format(style=target_styles[style_id], PID=user_PID)
         # st.write("file name is "+file_name)
         
         chat_history_df.to_csv(file_name, index=False)
