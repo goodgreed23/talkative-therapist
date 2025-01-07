@@ -30,7 +30,7 @@ from utils.utils import response_generator
 st.set_page_config(page_title="Therapist Chatbot Evaluation", page_icon=None, layout="centered", initial_sidebar_state="expanded", menu_items=None)
 
 # CONFIGS
-style_id = 0
+style_id = 1
 min_turns = 10   # number of turns to make before users can save the chat
 MODEL_SELECTED = "gpt-4o"
 
