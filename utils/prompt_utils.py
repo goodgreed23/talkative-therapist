@@ -1,6 +1,6 @@
 target_styles = ['authoritative', 'talkative', 'sentimentality', 'conversational dominance', 'informality', 'conciseness']
 
-definitions = ["Authoritative is the tendency to command or demand others in a conversation, without considering the others' willingness and concerns.",
+definitions = ["Authoritative is the tendency to command or demand others in a conversation.",
                "Talkativeness is a tendency to initiate a conversation, talk a lot, and avoid silence in a conversation. ",
                "Sentimentality is a tendency to express one's own emotions or display empathic emotional responses to others in a conversation.",
                "Conversational dominance is the tendency to take the lead in a conversation and detremine its topics and directions.",
